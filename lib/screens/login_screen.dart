@@ -37,7 +37,7 @@ class LoginScreenState extends State<LoginScreen> {
       }
 
       // Qui puoi gestire il login di successo
-      print('Login successful: $response');
+      print('Login successful: $_errorMessage');
 
       // Aggiorna lo stato della sessione
       final session = Provider.of<SessionProvider>(context, listen: false);

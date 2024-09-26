@@ -4,8 +4,10 @@ class AuthService {
   final Dio _dio = Dio();
 
   AuthService() {
-    _dio.options.connectTimeout = const Duration(milliseconds: 5000);
-    _dio.options.receiveTimeout = const Duration(milliseconds: 3000);
+    _dio.options.connectTimeout =
+        const Duration(milliseconds: 30000); // Aumenta il timeout a 10 secondi
+    _dio.options.receiveTimeout =
+        const Duration(milliseconds: 5000); // Mantieni il timeout di ricezione
   }
 
   Future<Map<String, dynamic>> login(String username, String password) async {
@@ -19,6 +21,9 @@ class AuthService {
           'password': password,
         },
       );
+
+      print('Risposta API: ${response.data}'); // Aggiunto per debug
+
       if (response.statusCode == 200) {
         return response.data;
       } else {
