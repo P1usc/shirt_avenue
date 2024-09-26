@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shirt_avenue/screens/home_screen.dart';
 import 'package:shirt_avenue/services/auth_service.dart';
+import 'package:shirt_avenue/providers/session_provider.dart'; // Assicurati di importare il tuo SessionProvider
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,13 +36,23 @@ class LoginScreenState extends State<LoginScreen> {
         throw Exception(response['error']);
       }
 
-      // Qui puoi gestire il login di successo, ad esempio navigare a un'altra pagina.
+      // Qui puoi gestire il login di successo
       print('Login successful: $response');
+
+      // Aggiorna lo stato della sessione
+      final session = Provider.of<SessionProvider>(context, listen: false);
+      await session.login(_usernameController.text, _passwordController.text);
+
+      // Naviga alla HomeScreen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
       });
-      print('Errore di login: $e'); // Stampa il messaggio d'errore
+      print('Errore di login: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -50,9 +63,6 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
