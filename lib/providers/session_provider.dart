@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shirt_avenue/models/preferito.dart';
 import 'package:shirt_avenue/pages/profilo_page.dart';
 import 'package:shirt_avenue/services/auth_service.dart';
 import 'package:shirt_avenue/models/account.dart';
@@ -11,11 +12,13 @@ class SessionProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   late Account _account;
   final AuthService _authService = AuthService();
+  List<Preferito> _preferiti = []; // Aggiungi i preferiti qui
 
   String get username => _username;
   bool get isLoggedIn => _isLoggedIn;
   Account get account => _account;
   Cliente get cliente => _account.cliente;
+  List<Preferito> get preferiti => _preferiti; // Aggiungi questa riga
 
   Future<void> loadSession() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -53,6 +56,13 @@ class SessionProvider with ChangeNotifier {
 
         print('ID Account salvato: ${account.id}');
 
+        // Parsing dei preferiti
+        if (response.containsKey('preferiti') &&
+            response['preferiti'] != null) {
+          List<dynamic> preferitiJson = response['preferiti'];
+          _preferiti = preferitiJson.map((p) => Preferito.fromJson(p)).toList();
+        }
+
         _account = account;
         _isLoggedIn = true; // Aggiunto per impostare il login
 
@@ -83,6 +93,7 @@ class SessionProvider with ChangeNotifier {
     await prefs.remove('username');
     await prefs.setBool('isLoggedIn', false);
     await prefs.remove('account');
+    await prefs.remove('preferiti'); // Rimuovi i preferiti
     notifyListeners();
   }
 }

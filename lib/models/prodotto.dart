@@ -17,7 +17,9 @@ class Prodotto {
     return Prodotto(
       id: json['id'],
       nome: json['nome'],
-      costo: json['costo'],
+      costo: (json['costo'] is int)
+          ? json['costo'].toDouble()
+          : json['costo'], // Assicurati che sia double
       categoria: json['categoria'],
       marca: json['marca'],
     );

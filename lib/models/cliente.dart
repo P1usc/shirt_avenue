@@ -1,6 +1,5 @@
 import 'package:shirt_avenue/models/preferito.dart';
-import 'package:shirt_avenue/models/prodotto.dart';
-import 'package:shirt_avenue/models/carrello.dart'; // Ensure you have a Carrello model
+import 'package:shirt_avenue/models/carrello.dart'; // Assicurati di importare il modello Carrello
 
 class Cliente {
   final int id;
@@ -9,7 +8,7 @@ class Cliente {
   final String indirizzo;
   final String telefono;
   final List<Preferito>? preferiti;
-  final Carrello? carrello; // Make carrello nullable
+  final Carrello? carrello; // Aggiunto carrello qui
 
   Cliente({
     required this.id,
@@ -17,8 +16,8 @@ class Cliente {
     required this.cognome,
     required this.indirizzo,
     required this.telefono,
-    required this.preferiti,
-    this.carrello, // Allow this to be optional
+    this.preferiti,
+    this.carrello, // Imposta carrello come opzionale
   });
 
   factory Cliente.fromJson(Map<String, dynamic> json) {
@@ -41,7 +40,7 @@ class Cliente {
       indirizzo: json['indirizzo'],
       telefono: json['telefono'],
       preferiti: preferitiList,
-      carrello: carrello, // Set carrello if it exists
+      carrello: carrello, // Set carrello se esiste
     );
   }
 
@@ -53,7 +52,7 @@ class Cliente {
       'indirizzo': indirizzo,
       'telefono': telefono,
       'preferiti': preferiti?.map((e) => e.toJson()).toList(),
-      'carrello': carrello?.toJson(), // Use toJson if carrello is not null
+      'carrello': carrello?.toJson(), // Usa toJson se carrello non è null
     };
   }
 }
