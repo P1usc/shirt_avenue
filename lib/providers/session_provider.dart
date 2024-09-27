@@ -13,8 +13,10 @@ class SessionProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   late Account _account;
   final AuthService _authService = AuthService();
+
   List<Preferito> _preferiti = [];
-  Carrello? _carrello;
+  Carrello? _carrello =
+      Carrello(id: 0, item_carrelli: []); // Inizializza come vuoto
 
   String get username => _username;
   bool get isLoggedIn => _isLoggedIn;
@@ -46,6 +48,8 @@ class SessionProvider with ChangeNotifier {
       print('Carrello caricato: ${jsonEncode(_carrello!.toJson())}');
     } else {
       print('Nessun carrello trovato nelle preferenze.');
+      _carrello = Carrello(
+          id: 0, item_carrelli: []); // Imposta carrello vuoto se non esiste
     }
 
     // Carica i preferiti
@@ -57,6 +61,7 @@ class SessionProvider with ChangeNotifier {
       print('Preferiti caricati: ${_preferiti.length}');
     } else {
       print('Nessun preferito trovato nelle preferenze.');
+      _preferiti = []; // Imposta preferiti come vuoti
     }
 
     notifyListeners();
@@ -78,7 +83,16 @@ class SessionProvider with ChangeNotifier {
           'id': response['account']['id'],
           'username': response['account']['username'],
           'email': response['account']['email'],
-          'cliente': response['cliente'],
+          // Gestione cliente con indirizzo e telefono null
+          'cliente': {
+            'id': response['cliente']['id'],
+            'nome': response['cliente']['nome'],
+            'cognome': response['cliente']['cognome'],
+            'indirizzo': response['cliente']['indirizzo'] ??
+                '', // Imposta come stringa vuota se null
+            'telefono': response['cliente']['telefono'] ??
+                '', // Imposta come stringa vuota se null
+          },
         });
 
         print('ID Account salvato: ${account.id}');
@@ -91,6 +105,7 @@ class SessionProvider with ChangeNotifier {
           print('Preferiti caricati: ${_preferiti.length}');
         } else {
           print('Nessun preferito trovato nella risposta.');
+          _preferiti = []; // Imposta come vuoti se non ci sono preferiti
         }
 
         // Parsing del carrello
@@ -106,6 +121,10 @@ class SessionProvider with ChangeNotifier {
 
           _carrello = Carrello(id: carrelloJson['id'], item_carrelli: items);
           print('Carrello caricato: ${jsonEncode(_carrello!.toJson())}');
+        } else {
+          print('Nessun carrello trovato nella risposta.');
+          _carrello =
+              Carrello(id: 0, item_carrelli: []); // Inizializza come vuoto
         }
 
         _account = account;
