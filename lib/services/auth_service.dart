@@ -9,7 +9,7 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> login(String username, String password) async {
-    const String url = 'http://10.11.11.158:1337/api/login/';
+    const String url = 'http://192.168.1.160:1337/api/login/';
 
     try {
       Response response = await _dio.post(

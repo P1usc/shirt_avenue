@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shirt_avenue/models/prodotto.dart';
 
 class ProdottoService {
-  final String baseUrl = 'http://10.11.11.158:1337/api';
+  final String baseUrl = 'http://192.168.1.160:1337/api';
   final Dio dio = Dio();
 
   // Metodo per ottenere tutti i prodotti
