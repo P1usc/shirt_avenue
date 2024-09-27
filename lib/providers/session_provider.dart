@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shirt_avenue/models/carrello.dart';
+import 'package:shirt_avenue/models/item_carrello.dart';
 import 'package:shirt_avenue/models/preferito.dart';
-import 'package:shirt_avenue/pages/profilo_page.dart';
 import 'package:shirt_avenue/services/auth_service.dart';
 import 'package:shirt_avenue/models/account.dart';
 import 'package:shirt_avenue/models/cliente.dart';
@@ -12,38 +13,64 @@ class SessionProvider with ChangeNotifier {
   bool _isLoggedIn = false;
   late Account _account;
   final AuthService _authService = AuthService();
-  List<Preferito> _preferiti = []; // Aggiungi i preferiti qui
+  List<Preferito> _preferiti = [];
+  Carrello? _carrello;
 
   String get username => _username;
   bool get isLoggedIn => _isLoggedIn;
   Account get account => _account;
   Cliente get cliente => _account.cliente;
-  List<Preferito> get preferiti => _preferiti; // Aggiungi questa riga
+  List<Preferito> get preferiti => _preferiti;
+  Carrello? get carrello => _carrello;
 
   Future<void> loadSession() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _username = prefs.getString('username') ?? '';
     _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
     String? accountJson = prefs.getString('account');
+
+    print('Caricamento della sessione...');
+    print('Username: $_username');
+    print('IsLoggedIn: $_isLoggedIn');
+
     if (accountJson != null) {
       _account = Account.fromJson(jsonDecode(accountJson));
+      print('Account caricato: ${_account.username}');
+    } else {
+      print('Nessun account trovato nelle preferenze.');
     }
+
+    String? carrelloJson = prefs.getString('carrello');
+    if (carrelloJson != null) {
+      _carrello = Carrello.fromJson(jsonDecode(carrelloJson));
+      print('Carrello caricato: ${jsonEncode(_carrello!.toJson())}');
+    } else {
+      print('Nessun carrello trovato nelle preferenze.');
+    }
+
+    // Carica i preferiti
+    String? preferitiJson = prefs.getString('preferiti');
+    if (preferitiJson != null) {
+      _preferiti = (jsonDecode(preferitiJson) as List)
+          .map((p) => Preferito.fromJson(p))
+          .toList();
+      print('Preferiti caricati: ${_preferiti.length}');
+    } else {
+      print('Nessun preferito trovato nelle preferenze.');
+    }
+
     notifyListeners();
   }
 
   Future<void> login(String username, String password) async {
     try {
       final response = await _authService.login(username, password);
-
-      // Stampa l'intera risposta del server per verificarne il contenuto
       print('Risposta del server: $response');
 
-      // Se la risposta è null o vuota, segnala l'errore
       if (response.isEmpty) {
         throw Exception('Errore di connessione o il server non ha risposto.');
       }
 
-      // Verifica se la risposta contiene i dati dell'account
       if (!response.containsKey('account') || response['account'] == null) {
         throw Exception('La risposta non contiene i dati dell\'account.');
       } else {
@@ -61,17 +88,44 @@ class SessionProvider with ChangeNotifier {
             response['preferiti'] != null) {
           List<dynamic> preferitiJson = response['preferiti'];
           _preferiti = preferitiJson.map((p) => Preferito.fromJson(p)).toList();
+          print('Preferiti caricati: ${_preferiti.length}');
+        } else {
+          print('Nessun preferito trovato nella risposta.');
+        }
+
+        // Parsing del carrello
+        if (response.containsKey('carrello') && response['carrello'] != null) {
+          var carrelloJson = response['carrello'];
+          List<ItemCarrello> items = [];
+
+          if (carrelloJson['items'] != null) {
+            for (var item in carrelloJson['items']) {
+              items.add(ItemCarrello.fromJson(item));
+            }
+          }
+
+          _carrello = Carrello(id: carrelloJson['id'], item_carrelli: items);
+          print('Carrello caricato: ${jsonEncode(_carrello!.toJson())}');
         }
 
         _account = account;
-        _isLoggedIn = true; // Aggiunto per impostare il login
+        _isLoggedIn = true;
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setInt('accountId', account.id);
         await prefs.setString('username', account.username);
         await prefs.setBool('isLoggedIn', true);
 
-        MaterialPageRoute(builder: (context) => const ProfiloPage());
+        if (_carrello != null) {
+          await prefs.setString('carrello', jsonEncode(_carrello!.toJson()));
+          print('Carrello salvato nelle preferenze.');
+        }
+
+        if (_preferiti.isNotEmpty) {
+          await prefs.setString('preferiti',
+              jsonEncode(_preferiti.map((p) => p.toJson()).toList()));
+          print('Preferiti salvati nelle preferenze.');
+        }
 
         notifyListeners();
       }
@@ -87,13 +141,16 @@ class SessionProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    print('Logout in corso...');
     _username = '';
     _isLoggedIn = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
     await prefs.setBool('isLoggedIn', false);
     await prefs.remove('account');
-    await prefs.remove('preferiti'); // Rimuovi i preferiti
+    await prefs.remove('preferiti');
+    await prefs.remove('carrello');
+
     notifyListeners();
   }
 }

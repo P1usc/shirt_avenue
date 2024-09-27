@@ -1,27 +1,26 @@
+import 'package:shirt_avenue/models/item_carrello.dart';
+
 class Carrello {
   final int id;
-  final List<dynamic> item_carrelli; // Adjust this type as needed
-  final double totale;
+  final List<ItemCarrello> item_carrelli;
 
-  Carrello({
-    required this.id,
-    required this.item_carrelli,
-    required this.totale,
-  });
+  Carrello({required this.id, required this.item_carrelli});
 
   factory Carrello.fromJson(Map<String, dynamic> json) {
+    var items = json['items'] as List;
+    List<ItemCarrello> itemCarrelliList =
+        items.map((i) => ItemCarrello.fromJson(i)).toList();
+
     return Carrello(
       id: json['id'],
-      item_carrelli: json['item_carrelli'] ?? [],
-      totale: json['totale']?.toDouble() ?? 0.0, // Handle potential null
+      item_carrelli: itemCarrelliList,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'item_carrelli': item_carrelli,
-      'totale': totale,
+      'items': item_carrelli.map((item) => item.toJson()).toList(),
     };
   }
 }
