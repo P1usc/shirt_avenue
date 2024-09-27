@@ -2,7 +2,7 @@ class Cliente {
   final String nome;
   final String cognome;
   final String indirizzo;
-  final int telefono;
+  final String telefono; // Manteniamo questo come String per gestire biginteger
   final String? imgprofile;
 
   Cliente({
@@ -19,7 +19,7 @@ class Cliente {
       nome: json['nome'],
       cognome: json['cognome'],
       indirizzo: json['indirizzo'],
-      telefono: json['telefono'],
+      telefono: json['telefono'].toString(), // Convertiamo in String
       imgprofile: json['imgprofile'],
     );
   }
@@ -30,7 +30,7 @@ class Cliente {
       'nome': nome,
       'cognome': cognome,
       'indirizzo': indirizzo,
-      'telefono': telefono,
+      'telefono': telefono, // Mantenere come String
       'imgprofile': imgprofile,
     };
   }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirt_avenue/providers/session_provider.dart';
 import 'package:shirt_avenue/screens/home_screen.dart';
-import 'package:shirt_avenue/screens/login_screen.dart';
 
 void main() {
   runApp(
