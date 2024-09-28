@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-class ProdottoService {
+class ProdottofiltroService {
   final Dio _dio = Dio();
 
   Future<List<dynamic>> fetchProdottiPerGenere(String tipo) async {
