@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:shirt_avenue/models/prodotto.dart';
 
 class ProdottofiltroService {
   final Dio _dio = Dio();
 
-  Future<List<dynamic>> fetchProdottiPerGenere(String tipo) async {
+  Future<List<Prodotto>> fetchProdottiPerGenere(String tipo) async {
     try {
       final response = await _dio
           .get('http://192.168.1.160:1337/api/prodotti-per-genere?tipo=$tipo');
@@ -11,13 +12,18 @@ class ProdottofiltroService {
 
       // Controlla la struttura della risposta e restituisci i dati correttamente
       if (response.data is List) {
-        return response.data; // Se i dati sono direttamente nella lista
-      } else if (response.data['data'] is List) {
-        return response.data['data']; // Se c'è un ulteriore livello 'data'
+        List<dynamic> prodottiJson = response.data;
+
+        // Converti ogni elemento della lista in un oggetto Prodotto
+        List<Prodotto> prodotti =
+            prodottiJson.map((json) => Prodotto.fromJson(json)).toList();
+
+        return prodotti;
       } else {
         throw Exception('Unexpected response format');
       }
     } catch (e) {
+      print('Error: ${e.toString()}'); // Mostra l'errore dettagliato
       throw Exception('Failed to load products: $e');
     }
   }

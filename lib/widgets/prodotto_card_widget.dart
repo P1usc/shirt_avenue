@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirt_avenue/providers/session_provider.dart';
+import 'package:shirt_avenue/screens/login_screen.dart';
+import 'package:shirt_avenue/models/prodotto.dart';
 
 class ProdottoCard extends StatefulWidget {
-  final dynamic prodotto;
+  final Prodotto prodotto;
 
   const ProdottoCard({super.key, required this.prodotto});
 
@@ -12,7 +14,17 @@ class ProdottoCard extends StatefulWidget {
 }
 
 class _ProdottoCardState extends State<ProdottoCard> {
-  bool _isFavorited = false;
+  late bool _isFavorited;
+
+  @override
+  void initState() {
+    super.initState();
+    final sessionProvider =
+        Provider.of<SessionProvider>(context, listen: false);
+    // Verifica se il prodotto è già tra i preferiti
+    _isFavorited = sessionProvider.preferiti.any((preferito) =>
+        preferito.prodotti.any((p) => p.id == widget.prodotto.id));
+  }
 
   void _onFavoritePressed() {
     final sessionProvider =
@@ -23,6 +35,14 @@ class _ProdottoCardState extends State<ProdottoCard> {
     } else {
       setState(() {
         _isFavorited = !_isFavorited;
+
+        if (_isFavorited) {
+          // Aggiungi il prodotto ai preferiti
+          sessionProvider.addPreferito(widget.prodotto);
+        } else {
+          // Rimuovi il prodotto dai preferiti
+          sessionProvider.removePreferito(widget.prodotto);
+        }
       });
     }
   }
@@ -45,8 +65,10 @@ class _ProdottoCardState extends State<ProdottoCard> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Naviga alla pagina di login
-                Navigator.pushNamed(context, '/login');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
               },
               child: const Text('Login'),
             ),
@@ -58,10 +80,7 @@ class _ProdottoCardState extends State<ProdottoCard> {
 
   @override
   Widget build(BuildContext context) {
-    var imageUrl = widget.prodotto['pngProd'] != null &&
-            widget.prodotto['pngProd']['url'] != null
-        ? 'http://192.168.1.160:1337${widget.prodotto['pngProd']['url']}'
-        : 'https://via.placeholder.com/150';
+    var imageUrl = widget.prodotto.pngProd;
 
     return Card(
       child: Column(
@@ -72,6 +91,10 @@ class _ProdottoCardState extends State<ProdottoCard> {
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons
+                      .error); // Mostra un'icona di errore se l'immagine non viene caricata
+                },
               ),
             ),
           ),
@@ -82,7 +105,7 @@ class _ProdottoCardState extends State<ProdottoCard> {
               children: [
                 Expanded(
                   child: Text(
-                    widget.prodotto['nome'] ?? 'Prodotto',
+                    widget.prodotto.nome,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -98,14 +121,12 @@ class _ProdottoCardState extends State<ProdottoCard> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              widget.prodotto['categoria'] ?? 'Categoria',
-            ),
+            child: Text(widget.prodotto.categoria),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              '€${widget.prodotto['costo']}',
+              '€${widget.prodotto.costo.toStringAsFixed(2)}', // Format to two decimal places
               style: const TextStyle(color: Colors.orange),
             ),
           ),
