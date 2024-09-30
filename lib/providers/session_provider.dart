@@ -131,14 +131,18 @@ class SessionProvider with ChangeNotifier {
   Future<void> logout() async {
     _username = '';
     _isLoggedIn = false;
-    _account = null; // Assicurati che l'account sia resettato
+    _account = null; // Resetta l'account
+    _preferiti.clear(); // Svuota la lista dei preferiti
+    _carrello = Carrello(id: 0, item_carrelli: []); // Reset carrello
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
     await prefs.setBool('isLoggedIn', false);
     await prefs.remove('account');
     await prefs.remove('preferiti');
     await prefs.remove('carrello');
-    notifyListeners();
+
+    notifyListeners(); // Aggiorna la UI per rendere i cuori grigi
   }
 
   // Aggiungi un prodotto ai preferiti e chiama l'API
