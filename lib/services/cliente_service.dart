@@ -3,7 +3,7 @@ import 'package:shirt_avenue/models/account.dart';
 import 'package:shirt_avenue/models/cliente.dart';
 
 class ClienteService {
-  final String baseUrl = 'http://192.168.1.160:1337/api';
+  final String baseUrl = 'http://10.11.11.135:1337/api';
   final Dio dio = Dio();
 
   Future<Map<String, dynamic>> getInfoCliente(int id) async {

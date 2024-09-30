@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 class BannerService {
   final Dio _dio = Dio();
   final String _baseUrl =
-      'http://192.168.1.160:1337/api/banners/?populate=imgbanner';
+      'http://10.11.11.135:1337/api/banners/?populate=imgbanner';
 
   Future<List<dynamic>> fetchBanners() async {
     try {

@@ -12,7 +12,7 @@ class Prodotto {
 
   // Host base dell'API
   static const String baseUrl =
-      'http://192.168.1.160:1337'; // Sostituisci con il tuo host
+      'http://10.11.11.135:1337'; // Sostituisci con il tuo host
 
   Prodotto({
     required this.id,

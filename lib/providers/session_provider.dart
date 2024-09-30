@@ -7,17 +7,19 @@ import 'package:shirt_avenue/models/preferito.dart';
 import 'package:shirt_avenue/services/auth_service.dart';
 import 'package:shirt_avenue/models/account.dart';
 import 'package:shirt_avenue/models/cliente.dart';
-import 'package:shirt_avenue/models/prodotto.dart'; // Assicurati di avere il modello Prodotto
+import 'package:shirt_avenue/models/prodotto.dart';
+import 'package:shirt_avenue/services/preferito_service.dart';
 
 class SessionProvider with ChangeNotifier {
   String _username = '';
   bool _isLoggedIn = false;
   late Account _account;
   final AuthService _authService = AuthService();
+  final WishlistService _wishlistService =
+      WishlistService(); // Inizializza il servizio wishlist
 
   List<Preferito> _preferiti = [];
-  Carrello? _carrello =
-      Carrello(id: 0, item_carrelli: []); // Inizializza come vuoto
+  Carrello? _carrello = Carrello(id: 0, item_carrelli: []);
 
   String get username => _username;
   bool get isLoggedIn => _isLoggedIn;
@@ -40,8 +42,7 @@ class SessionProvider with ChangeNotifier {
     if (carrelloJson != null) {
       _carrello = Carrello.fromJson(jsonDecode(carrelloJson));
     } else {
-      _carrello = Carrello(
-          id: 0, item_carrelli: []); // Imposta carrello vuoto se non esiste
+      _carrello = Carrello(id: 0, item_carrelli: []);
     }
 
     String? preferitiJson = prefs.getString('preferiti');
@@ -139,20 +140,39 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Aggiungi un prodotto ai preferiti
-  void addPreferito(Prodotto prodotto) {
+  // Aggiungi un prodotto ai preferiti e chiama l'API
+  Future<void> addPreferito(Prodotto prodotto) async {
     final preferito = Preferito(id: prodotto.id, prodotti: [prodotto]);
     _preferiti.add(preferito);
+
+    // Salva localmente
     _savePreferiti();
-    notifyListeners();
+
+    // Chiama l'API per aggiungere il prodotto ai preferiti
+    try {
+      await _wishlistService.addToWishlist(_account.cliente.id, [prodotto.id]);
+      notifyListeners();
+    } catch (error) {
+      print('Errore durante l\'aggiunta ai preferiti: $error');
+    }
   }
 
-  // Rimuovi un prodotto dai preferiti
-  void removePreferito(Prodotto prodotto) {
+  // Rimuovi un prodotto dai preferiti e chiama l'API
+  Future<void> removePreferito(Prodotto prodotto) async {
     _preferiti.removeWhere(
         (preferito) => preferito.prodotti.any((p) => p.id == prodotto.id));
+
+    // Salva localmente
     _savePreferiti();
-    notifyListeners();
+
+    // Chiama l'API per rimuovere il prodotto dai preferiti
+    try {
+      await _wishlistService.removeFromWishlist(
+          _account.cliente.id, prodotto.id);
+      notifyListeners();
+    } catch (error) {
+      print('Errore durante la rimozione dai preferiti: $error');
+    }
   }
 
   // Salva i preferiti nelle SharedPreferences

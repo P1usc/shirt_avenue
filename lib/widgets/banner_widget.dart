@@ -40,7 +40,7 @@ class _CustomBannerState extends State<CustomBanner> {
             itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
               final banner = snapshot.data![index];
-              final imageUrl = 'http://192.168.1.160:1337' +
+              final imageUrl = 'http://10.11.11.135:1337' +
                   banner['attributes']['imgbanner']['data']['attributes']
                       ['formats']['small']['url'];
 

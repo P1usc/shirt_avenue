@@ -15,6 +15,7 @@ class ProdottoCard extends StatefulWidget {
 
 class _ProdottoCardState extends State<ProdottoCard> {
   late bool _isFavorited;
+  late bool _isLoading;
 
   @override
   void initState() {
@@ -24,26 +25,49 @@ class _ProdottoCardState extends State<ProdottoCard> {
     // Verifica se il prodotto è già tra i preferiti
     _isFavorited = sessionProvider.preferiti.any((preferito) =>
         preferito.prodotti.any((p) => p.id == widget.prodotto.id));
+    _isLoading = false; // Inizializza il flag di caricamento
   }
 
-  void _onFavoritePressed() {
+  Future<void> _onFavoritePressed() async {
     final sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
+    final cliente = sessionProvider.account.cliente;
 
     if (!sessionProvider.isLoggedIn) {
       _showLoginDialog();
     } else {
       setState(() {
-        _isFavorited = !_isFavorited;
+        _isLoading = true; // Inizia il caricamento
+      });
+
+      try {
+        print('Cliente: $cliente');
+        print('ID del prodotto selezionato: ${widget.prodotto.id}');
 
         if (_isFavorited) {
-          // Aggiungi il prodotto ai preferiti
-          sessionProvider.addPreferito(widget.prodotto);
+          // Se il cuore è rosso, rimuovi il prodotto dai preferiti
+          await sessionProvider.removePreferito(widget.prodotto);
+          print('Prodotto rimosso dai preferiti: ${widget.prodotto.id}');
         } else {
-          // Rimuovi il prodotto dai preferiti
-          sessionProvider.removePreferito(widget.prodotto);
+          // Se il cuore non è rosso, aggiungi il prodotto ai preferiti
+          await sessionProvider.addPreferito(widget.prodotto);
+          print('Prodotto aggiunto ai preferiti: ${widget.prodotto.id}');
         }
-      });
+
+        // Aggiorna lo stato del cuore
+        setState(() {
+          _isFavorited = !_isFavorited; // Inverti lo stato
+        });
+      } catch (error) {
+        print('Errore durante la gestione dei preferiti: $error');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Errore: $error'),
+        ));
+      } finally {
+        setState(() {
+          _isLoading = false; // Fine del caricamento
+        });
+      }
     }
   }
 
@@ -109,13 +133,15 @@ class _ProdottoCardState extends State<ProdottoCard> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    _isFavorited ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorited ? Colors.red : Colors.grey,
-                  ),
-                  onPressed: _onFavoritePressed,
-                ),
+                _isLoading
+                    ? const CircularProgressIndicator() // Mostra un indicatore di caricamento
+                    : IconButton(
+                        icon: Icon(
+                          _isFavorited ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorited ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: _onFavoritePressed,
+                      ),
               ],
             ),
           ),

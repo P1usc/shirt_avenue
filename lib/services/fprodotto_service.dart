@@ -7,7 +7,7 @@ class ProdottofiltroService {
   Future<List<Prodotto>> fetchProdottiPerGenere(String tipo) async {
     try {
       final response = await _dio
-          .get('http://192.168.1.160:1337/api/prodotti-per-genere?tipo=$tipo');
+          .get('http://10.11.11.135:1337/api/prodotti-per-genere?tipo=$tipo');
       print(response.data); // Controlla la risposta
 
       // Controlla la struttura della risposta e restituisci i dati correttamente
