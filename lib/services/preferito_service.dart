@@ -29,7 +29,7 @@ class WishlistService {
         '$baseUrl/remove',
         data: {
           'clienteId': clienteId,
-          'prodottoId': [prodottoId], // Lista singola per un prodotto
+          'prodottoId': prodottoId, // Lista singola per un prodotto
         },
       );
       print('Prodotto rimosso dai preferiti: ${response.data}');

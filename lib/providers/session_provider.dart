@@ -13,7 +13,7 @@ import 'package:shirt_avenue/services/preferito_service.dart';
 class SessionProvider with ChangeNotifier {
   String _username = '';
   bool _isLoggedIn = false;
-  late Account _account;
+  Account? _account; // Modificato: Nullable
   final AuthService _authService = AuthService();
   final WishlistService _wishlistService =
       WishlistService(); // Inizializza il servizio wishlist
@@ -23,8 +23,8 @@ class SessionProvider with ChangeNotifier {
 
   String get username => _username;
   bool get isLoggedIn => _isLoggedIn;
-  Account get account => _account;
-  Cliente get cliente => _account.cliente;
+  Account? get account => _account; // Modificato: Nullable
+  Cliente? get cliente => _account?.cliente; // Modificato: Nullable
   List<Preferito> get preferiti => _preferiti;
   Carrello? get carrello => _carrello;
 
@@ -131,6 +131,7 @@ class SessionProvider with ChangeNotifier {
   Future<void> logout() async {
     _username = '';
     _isLoggedIn = false;
+    _account = null; // Assicurati che l'account sia resettato
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('username');
     await prefs.setBool('isLoggedIn', false);
@@ -150,8 +151,11 @@ class SessionProvider with ChangeNotifier {
 
     // Chiama l'API per aggiungere il prodotto ai preferiti
     try {
-      await _wishlistService.addToWishlist(_account.cliente.id, [prodotto.id]);
-      notifyListeners();
+      if (_account != null) {
+        await _wishlistService
+            .addToWishlist(_account!.cliente.id, [prodotto.id]);
+        notifyListeners();
+      }
     } catch (error) {
       print('Errore durante l\'aggiunta ai preferiti: $error');
     }
@@ -167,9 +171,11 @@ class SessionProvider with ChangeNotifier {
 
     // Chiama l'API per rimuovere il prodotto dai preferiti
     try {
-      await _wishlistService.removeFromWishlist(
-          _account.cliente.id, prodotto.id);
-      notifyListeners();
+      if (_account != null) {
+        await _wishlistService.removeFromWishlist(
+            _account!.cliente.id, prodotto.id);
+        notifyListeners();
+      }
     } catch (error) {
       print('Errore durante la rimozione dai preferiti: $error');
     }

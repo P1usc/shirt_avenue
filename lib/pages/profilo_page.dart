@@ -37,14 +37,14 @@ class ProfiloPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Nome: ${cliente.nome}',
+                      Text('Nome: ${cliente?.nome}',
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold)),
-                      Text('Cognome: ${cliente.cognome}',
+                      Text('Cognome: ${cliente?.cognome}',
                           style: const TextStyle(fontSize: 18)),
-                      Text('Indirizzo: ${cliente.indirizzo}',
+                      Text('Indirizzo: ${cliente?.indirizzo}',
                           style: const TextStyle(fontSize: 18)),
-                      Text('Telefono: ${cliente.telefono}',
+                      Text('Telefono: ${cliente?.telefono}',
                           style: const TextStyle(fontSize: 18)),
                     ],
                   ),

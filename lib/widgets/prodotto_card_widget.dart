@@ -31,7 +31,7 @@ class _ProdottoCardState extends State<ProdottoCard> {
   Future<void> _onFavoritePressed() async {
     final sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
-    final cliente = sessionProvider.account.cliente;
+    final cliente = sessionProvider.account?.cliente;
 
     if (!sessionProvider.isLoggedIn) {
       _showLoginDialog();
@@ -48,10 +48,16 @@ class _ProdottoCardState extends State<ProdottoCard> {
           // Se il cuore è rosso, rimuovi il prodotto dai preferiti
           await sessionProvider.removePreferito(widget.prodotto);
           print('Prodotto rimosso dai preferiti: ${widget.prodotto.id}');
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Prodotto rimosso dai preferiti'),
+          ));
         } else {
           // Se il cuore non è rosso, aggiungi il prodotto ai preferiti
           await sessionProvider.addPreferito(widget.prodotto);
           print('Prodotto aggiunto ai preferiti: ${widget.prodotto.id}');
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Prodotto aggiunto ai preferiti'),
+          ));
         }
 
         // Aggiorna lo stato del cuore

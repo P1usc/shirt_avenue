@@ -19,7 +19,7 @@ class Prodotto {
     required this.nome,
     required this.marca,
     required this.categoria,
-    this.shortdescrizione, // Campo nullable
+    this.shortdescrizione,
     required this.costo,
     required this.tipo,
     this.sconto,
