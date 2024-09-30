@@ -1,8 +1,11 @@
+// lib/screens/prodotto_card.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shirt_avenue/providers/session_provider.dart';
 import 'package:shirt_avenue/screens/login_screen.dart';
 import 'package:shirt_avenue/models/prodotto.dart';
+import 'package:shirt_avenue/widgets/prodotto_drawer.dart';
 
 class ProdottoCard extends StatefulWidget {
   final Prodotto prodotto;
@@ -26,7 +29,6 @@ class _ProdottoCardState extends State<ProdottoCard> {
   void _initializeFavoriteStatus() {
     final sessionProvider =
         Provider.of<SessionProvider>(context, listen: false);
-    // Check if the product is already in the user's favorites
     _isFavorited = sessionProvider.preferiti.any((preferito) =>
         preferito.prodotti.any((p) => p.id == widget.prodotto.id));
   }
@@ -99,15 +101,28 @@ class _ProdottoCardState extends State<ProdottoCard> {
     );
   }
 
+  void _openProductDrawer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return ProductDrawer(prodotto: widget.prodotto);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildProductImage(),
-          _buildProductInfo(),
-        ],
+    return GestureDetector(
+      onTap: _openProductDrawer,
+      child: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildProductImage(),
+            _buildProductInfo(),
+          ],
+        ),
       ),
     );
   }
@@ -165,11 +180,32 @@ class _ProdottoCardState extends State<ProdottoCard> {
   }
 
   Widget _buildProductPrice() {
+    // Check if the product has a discount
+    bool hasDiscount = widget.prodotto.sconto != null;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Text(
-        '€${widget.prodotto.costo.toStringAsFixed(2)}',
-        style: const TextStyle(color: Colors.orange),
+      child: Row(
+        children: [
+          if (hasDiscount)
+            Text(
+              '€${widget.prodotto.costo.toStringAsFixed(2)}', // Original price
+              style: const TextStyle(
+                color: Colors.red, // Original price in red
+                decoration: TextDecoration.lineThrough, // Strike-through effect
+              ),
+            ),
+          if (hasDiscount) const SizedBox(width: 8.0), // Space between prices
+          Text(
+            '€${hasDiscount ? widget.prodotto.prezzoScontato.toStringAsFixed(2) : widget.prodotto.costo.toStringAsFixed(2)}', // Display discounted price or original price
+            style: TextStyle(
+              color: hasDiscount
+                  ? Colors.green
+                  : Colors
+                      .orange, // Discounted price in green, original price in orange
+            ),
+          ),
+        ],
       ),
     );
   }
