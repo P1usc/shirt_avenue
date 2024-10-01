@@ -41,9 +41,11 @@ class Prodotto {
       categoria: json['categoria'] ?? 'N/A',
       shortdescrizione: json['shortdescrizione'],
       costo: _parseDouble(json['costoOriginale']),
-      lunghezza: json['lunghezza'] ?? 'N/A',
+      lunghezza: json['lunghezza'] ??
+          'N/A', // Ensure you handle this correctly based on your requirements
       sconto: json['sconto'],
-      prezzoScontato: _parseDouble(json['prezzoScontato']),
+      prezzoScontato: _parseDouble(json['prezzoScontato'] ??
+          0.0), // Ensure this is set correctly as needed
       pngProd: pngProd,
       taglia: json['taglia'] ?? 'N/A',
       colore: json['colore'] ?? 'N/A',
@@ -62,9 +64,10 @@ class Prodotto {
       categoria: json['categoria'] ?? 'N/A',
       shortdescrizione: json['shortdescrizione'],
       costo: _parseDouble(json['costo']),
-      lunghezza: json['tipo'] ?? 'N/A',
+      lunghezza: json['lunghezza'] ?? 'N/A', // Ensure this is relevant
       sconto: json['sconto'],
-      prezzoScontato: _parseDouble(json['prezzoScontato']),
+      prezzoScontato: _parseDouble(
+          json['prezzoScontato'] ?? 0.0), // Ensure this is set correctly
       pngProd: pngProd,
       taglia: json['taglia'] ?? 'N/A',
       colore: json['colore'] ?? 'N/A',
@@ -92,7 +95,7 @@ class Prodotto {
       'lunghezza': lunghezza,
       'sconto': sconto,
       'prezzoScontato': prezzoScontato,
-      'url': pngProd,
+      'pngProd': {'url': pngProd},
       'taglia': taglia,
       'colore': colore,
     };

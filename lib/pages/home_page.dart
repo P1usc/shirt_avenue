@@ -24,24 +24,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _loadProdotti() async {
+    // Imposta lo stato solo se il widget è montato
+    if (!mounted) return;
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       final prodotti =
           await ProdottofiltroService().fetchProdottiPerGenere(_activeButton);
 
       print(prodotti); // Log dei prodotti
 
-      setState(() {
-        _prodotti = prodotti;
-      });
+      // Imposta lo stato solo se il widget è montato
+      if (mounted) {
+        setState(() {
+          _prodotti = prodotti;
+        });
+      }
     } catch (e) {
       print('Errore nel caricamento dei prodotti: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      // Imposta lo stato solo se il widget è montato
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
