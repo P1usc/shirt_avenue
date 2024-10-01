@@ -180,7 +180,6 @@ class _ProdottoCardState extends State<ProdottoCard> {
   }
 
   Widget _buildProductPrice() {
-    // Check if the product has a discount
     bool hasDiscount = widget.prodotto.sconto != null;
 
     return Padding(
@@ -189,20 +188,17 @@ class _ProdottoCardState extends State<ProdottoCard> {
         children: [
           if (hasDiscount)
             Text(
-              '€${widget.prodotto.costo.toStringAsFixed(2)}', // Original price
+              '€${widget.prodotto.costo.toStringAsFixed(2)}',
               style: const TextStyle(
-                color: Colors.red, // Original price in red
-                decoration: TextDecoration.lineThrough, // Strike-through effect
+                color: Colors.red,
+                decoration: TextDecoration.lineThrough,
               ),
             ),
-          if (hasDiscount) const SizedBox(width: 8.0), // Space between prices
+          if (hasDiscount) const SizedBox(width: 8.0),
           Text(
             '€${hasDiscount ? widget.prodotto.prezzoScontato.toStringAsFixed(2) : widget.prodotto.costo.toStringAsFixed(2)}', // Display discounted price or original price
             style: TextStyle(
-              color: hasDiscount
-                  ? Colors.green
-                  : Colors
-                      .orange, // Discounted price in green, original price in orange
+              color: hasDiscount ? Colors.green : Colors.orange,
             ),
           ),
         ],

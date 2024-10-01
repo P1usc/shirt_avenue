@@ -9,7 +9,7 @@ class Preferito {
   factory Preferito.fromJson(Map<String, dynamic> json) {
     var prodottiFromJson = json['prodotti'] as List;
     List<Prodotto> prodottiList =
-        prodottiFromJson.map((i) => Prodotto.fromJson(i)).toList();
+        prodottiFromJson.map((i) => Prodotto.fromJsonOldFormat(i)).toList();
 
     return Preferito(
       id: json['id'],

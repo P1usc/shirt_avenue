@@ -4,11 +4,13 @@ class Prodotto {
   final String marca;
   final String categoria;
   final String? shortdescrizione;
-  final double costo; // Original cost
-  final String tipo;
-  final dynamic sconto; // Discount info
-  final double prezzoScontato; // Changed to double
+  final double costo;
+  final String lunghezza;
+  final dynamic sconto;
+  final double prezzoScontato;
   final String pngProd;
+  final String taglia;
+  final String colore;
 
   static const String baseUrl = 'http://10.11.11.135:1337';
 
@@ -19,17 +21,18 @@ class Prodotto {
     required this.categoria,
     this.shortdescrizione,
     required this.costo,
-    required this.tipo,
+    required this.lunghezza,
     this.sconto,
-    required this.prezzoScontato, // Changed to double
+    required this.prezzoScontato,
     required this.pngProd,
+    required this.taglia,
+    required this.colore,
   });
 
-  factory Prodotto.fromJson(Map<String, dynamic> json) {
-    String imageUrl =
-        (json['pngProd'] != null && json['pngProd']['url'] != null)
-            ? '$baseUrl${json['pngProd']['url']}'
-            : '$baseUrl/default-image.png';
+  factory Prodotto.fromJsonPreferiti(Map<String, dynamic> json) {
+    String pngProd = json['url'] != null
+        ? '$baseUrl${json['url']}'
+        : '$baseUrl/default-image.png';
 
     return Prodotto(
       id: json['id'],
@@ -37,23 +40,45 @@ class Prodotto {
       marca: json['marca'] ?? 'N/A',
       categoria: json['categoria'] ?? 'N/A',
       shortdescrizione: json['shortdescrizione'],
-      costo: _parseDouble(json['costo']), // Correct parsing for original cost
-      tipo: json['tipo'] ?? 'N/A',
+      costo: _parseDouble(json['costoOriginale']),
+      lunghezza: json['lunghezza'] ?? 'N/A',
       sconto: json['sconto'],
-      prezzoScontato: _parseDouble(
-          json['prezzoScontato']), // Correct parsing for discounted price
-      pngProd: imageUrl,
+      prezzoScontato: _parseDouble(json['prezzoScontato']),
+      pngProd: pngProd,
+      taglia: json['taglia'] ?? 'N/A',
+      colore: json['colore'] ?? 'N/A',
+    );
+  }
+
+  factory Prodotto.fromJsonOldFormat(Map<String, dynamic> json) {
+    String pngProd = (json['pngProd'] != null && json['pngProd']['url'] != null)
+        ? '$baseUrl${json['pngProd']['url']}'
+        : '$baseUrl/default-image.png';
+
+    return Prodotto(
+      id: json['id'],
+      nome: json['nome'] ?? 'N/A',
+      marca: json['marca'] ?? 'N/A',
+      categoria: json['categoria'] ?? 'N/A',
+      shortdescrizione: json['shortdescrizione'],
+      costo: _parseDouble(json['costo']),
+      lunghezza: json['tipo'] ?? 'N/A',
+      sconto: json['sconto'],
+      prezzoScontato: _parseDouble(json['prezzoScontato']),
+      pngProd: pngProd,
+      taglia: json['taglia'] ?? 'N/A',
+      colore: json['colore'] ?? 'N/A',
     );
   }
 
   static double _parseDouble(dynamic value) {
-    if (value == null) return 0.0; // Handle null case
+    if (value == null) return 0.0;
     if (value is String) {
-      return double.tryParse(value) ?? 0.0; // Try to parse as double
+      return double.tryParse(value) ?? 0.0;
     } else if (value is num) {
-      return value.toDouble(); // Return as double if it's a number
+      return value.toDouble();
     }
-    return 0.0; // Default case
+    return 0.0;
   }
 
   Map<String, dynamic> toJson() {
@@ -63,13 +88,13 @@ class Prodotto {
       'marca': marca,
       'categoria': categoria,
       'shortdescrizione': shortdescrizione,
-      'costo': costo,
-      'tipo': tipo,
+      'costoOriginale': costo,
+      'lunghezza': lunghezza,
       'sconto': sconto,
-      'prezzoScontato': prezzoScontato, // Correct type
-      'pngProd': {
-        'url': pngProd,
-      },
+      'prezzoScontato': prezzoScontato,
+      'url': pngProd,
+      'taglia': taglia,
+      'colore': colore,
     };
   }
 }

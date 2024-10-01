@@ -1,9 +1,7 @@
-// lib/widgets/product_drawer.dart
-
 import 'package:flutter/material.dart';
 import 'package:shirt_avenue/models/prodotto.dart';
 
-class ProductDrawer extends StatelessWidget {
+class ProductDrawer extends StatefulWidget {
   final Prodotto prodotto;
 
   const ProductDrawer({
@@ -12,12 +10,20 @@ class ProductDrawer extends StatelessWidget {
   });
 
   @override
+  _ProductDrawerState createState() => _ProductDrawerState();
+}
+
+class _ProductDrawerState extends State<ProductDrawer> {
+  String? selectedSize;
+  String? selectedColor;
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: Column(
         children: [
-          _buildAppBar(), // Simplified app bar with just a title
+          _buildAppBar(),
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -27,6 +33,10 @@ class ProductDrawer extends StatelessWidget {
                     _buildProductImage(),
                     const SizedBox(height: 16),
                     _buildProductDetails(),
+                    const SizedBox(height: 20),
+                    _buildSizeSelector(),
+                    const SizedBox(height: 16),
+                    _buildColorSelector(),
                     const SizedBox(height: 20),
                     _buildActionButtons(context),
                   ],
@@ -42,27 +52,27 @@ class ProductDrawer extends StatelessWidget {
   Widget _buildAppBar() {
     return AppBar(
       title: Text(
-        prodotto.nome,
+        widget.prodotto.nome,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 20,
-          color: Colors.black, // Change text color to black for better contrast
+          color: Colors.black,
         ),
       ),
-      centerTitle: true, // Center the title
-      elevation: 0, // Remove elevation for a flat look
-      automaticallyImplyLeading: false, // Remove the back arrow
+      centerTitle: true,
+      elevation: 0,
+      automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
-      toolbarHeight: 80, // Increase the height of the AppBar to give more space
+      toolbarHeight: 80,
     );
   }
 
   Widget _buildProductImage() {
     return Center(
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16), // Rounded corners
+        borderRadius: BorderRadius.circular(16),
         child: Image.network(
-          prodotto.pngProd,
+          widget.prodotto.pngProd,
           fit: BoxFit.cover,
           height: 300,
           errorBuilder: (context, error, stackTrace) {
@@ -78,7 +88,7 @@ class ProductDrawer extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          prodotto.nome,
+          widget.prodotto.nome,
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -86,16 +96,16 @@ class ProductDrawer extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Categoria: ${prodotto.categoria}',
+          'Categoria: ${widget.prodotto.categoria}',
           style: const TextStyle(fontSize: 18, color: Colors.grey),
         ),
         const SizedBox(height: 8),
         // Display original and discounted price
         Row(
           children: [
-            if (prodotto.sconto != null)
+            if (widget.prodotto.sconto != null)
               Text(
-                '€${prodotto.costo.toStringAsFixed(2)}',
+                '€${widget.prodotto.costo.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 18,
                   color: Colors.red, // Original price in red
@@ -105,11 +115,13 @@ class ProductDrawer extends StatelessWidget {
               ),
             const SizedBox(width: 8), // Space between prices
             Text(
-              '€${prodotto.prezzoScontato.toStringAsFixed(2)}',
+              '€${widget.prodotto.prezzoScontato.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: prodotto.sconto != null ? Colors.green : Colors.orange,
+                color: widget.prodotto.sconto != null
+                    ? Colors.green
+                    : Colors.orange,
               ),
             ),
           ],
@@ -121,8 +133,70 @@ class ProductDrawer extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          prodotto.shortdescrizione ?? 'Descrizione non disponibile.',
+          widget.prodotto.shortdescrizione ?? 'Descrizione non disponibile.',
           style: const TextStyle(fontSize: 16, color: Colors.black54),
+        ),
+      ],
+    );
+  }
+
+  // Size Selector Widget
+  Widget _buildSizeSelector() {
+    List<String> sizes = ['S', 'M', 'L', 'XL']; // Example sizes
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Text(
+          'Taglia:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 16),
+        DropdownButton<String>(
+          value: selectedSize,
+          hint: const Text('Seleziona taglia'),
+          onChanged: (value) {
+            setState(() {
+              selectedSize = value;
+            });
+          },
+          items: sizes.map((String size) {
+            return DropdownMenuItem<String>(
+              value: size,
+              child: Text(size),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  // Color Selector Widget
+  Widget _buildColorSelector() {
+    List<String> colors = ['Rosso', 'Blu', 'Verde', 'Nero']; // Example colors
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Text(
+          'Colore:',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(width: 16),
+        DropdownButton<String>(
+          value: selectedColor,
+          hint: const Text('Seleziona colore'),
+          onChanged: (value) {
+            setState(() {
+              selectedColor = value;
+            });
+          },
+          items: colors.map((String color) {
+            return DropdownMenuItem<String>(
+              value: color,
+              child: Text(color),
+            );
+          }).toList(),
         ),
       ],
     );

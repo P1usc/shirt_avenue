@@ -15,8 +15,9 @@ class ProdottofiltroService {
         List<dynamic> prodottiJson = response.data;
 
         // Converti ogni elemento della lista in un oggetto Prodotto
-        List<Prodotto> prodotti =
-            prodottiJson.map((json) => Prodotto.fromJson(json)).toList();
+        List<Prodotto> prodotti = prodottiJson
+            .map((json) => Prodotto.fromJsonOldFormat(json))
+            .toList();
 
         return prodotti;
       } else {

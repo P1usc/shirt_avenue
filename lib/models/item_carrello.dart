@@ -9,7 +9,7 @@ class ItemCarrello {
   factory ItemCarrello.fromJson(Map<String, dynamic> json) {
     return ItemCarrello(
       quantita: json['quantita'],
-      prodotto: Prodotto.fromJson(json['prodotto']),
+      prodotto: Prodotto.fromJsonOldFormat(json['prodotto']),
     );
   }
 
